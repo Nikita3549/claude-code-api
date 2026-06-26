@@ -18,7 +18,9 @@ type HTTPConfig struct {
 }
 
 func LoadConfig() *Config {
-	godotenv.Load(".env")
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf("godotenv error: %s", err.Error())
+	}
 
 	conf := &Config{}
 	errors := ParseConfig(conf)

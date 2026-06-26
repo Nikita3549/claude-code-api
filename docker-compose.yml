@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: .
+    container_name: api
+    profiles:
+      - api
+    # restart: always
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./.env:/opt/api/.env
+
+networks:
+  main:
+    driver: bridge
