@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"claude-code-api/internal/configs"
 )
 
 func App() http.Handler {
@@ -14,7 +16,8 @@ func App() http.Handler {
 
 func main() {
 	app := App()
-	port := 8080
+	conf := configs.LoadConfig()
+	port := conf.Port
 
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%v", port),
