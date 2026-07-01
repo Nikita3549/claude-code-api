@@ -1,0 +1,24 @@
+// Package db provides database connectivity
+package db
+
+import (
+	"claude-code-api/internal/configs"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+type DB struct {
+	*gorm.DB
+}
+
+func NewDB(conf *configs.Config) *DB {
+	db, err := gorm.Open(postgres.Open(conf.DBConfig.DSN), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	return &DB{
+		DB: db,
+	}
+}

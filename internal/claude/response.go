@@ -1,5 +1,7 @@
 package claude
 
+import "encoding/json"
+
 type CacheCreation struct {
 	Ephemeral1hInputTokens int `json:"ephemeral_1h_input_tokens"`
 	Ephemeral5mInputTokens int `json:"ephemeral_5m_input_tokens"`
@@ -64,4 +66,6 @@ type RunResponse struct {
 	TerminalReason    string                `json:"terminal_reason"`
 	FastModeState     string                `json:"fast_mode_state"`
 	UUID              string                `json:"uuid"`
+	Raw               json.RawMessage       `json:"raw"`
+	Model             string                `json:"model"`
 }

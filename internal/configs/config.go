@@ -11,10 +11,15 @@ import (
 
 type Config struct {
 	*HTTPConfig
+	*DBConfig
 }
 
 type HTTPConfig struct {
 	Port int `env:"PORT"`
+}
+
+type DBConfig struct {
+	DSN string `env:"DSN"`
 }
 
 func LoadConfig() *Config {

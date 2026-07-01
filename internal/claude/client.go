@@ -49,6 +49,8 @@ func (repo *Client) Run(ctx context.Context, input string, opts ...Option) (*Run
 	if err := json.Unmarshal(out, &r); err != nil {
 		return nil, err
 	}
+	r.Raw = json.RawMessage(out)
+	r.Model = cfg.model
 
 	return &r, nil
 }
