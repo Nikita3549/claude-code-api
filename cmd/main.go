@@ -1,10 +1,10 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"claude-code-api/internal/claude"
 	"claude-code-api/internal/configs"
@@ -14,14 +14,7 @@ import (
 
 func App() http.Handler {
 	router := http.NewServeMux()
-
-	return router
-}
-
-func main() {
-	app := App()
 	conf := configs.LoadConfig()
-	port := conf.Port
 	db := db.NewDB(conf)
 
 	// Repositories
@@ -36,16 +29,23 @@ func main() {
 		},
 	)
 
+	// Handlers
+	claude.NewClaudeHandler(router, claudeService)
+
+	return router
+}
+
+func main() {
+	app := App()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	server := http.Server{
-		Addr:    fmt.Sprintf(":%v", port),
+		Addr:    fmt.Sprintf(":%s", port),
 		Handler: app,
 	}
-	res, _ := claudeService.Ask(context.Background(), claude.AskClaudeRequest{
-		Question: "Привет! придумай стихотворение короткое",
-		Prompt:   "В каждой строке стихотворения должно быть слово 'солнце'",
-	})
-
-	fmt.Println(res)
 
 	log.Printf("Server started on port %v", port)
 	server.ListenAndServe()
