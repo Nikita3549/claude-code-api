@@ -8,18 +8,16 @@ Every request is also logged to Postgres (tokens, cost, duration, raw response) 
 
 ## Setup
 
-### 1. Claude CLI credentials
+### 1. Claude auth token
 
-The Docker image bakes your local Claude CLI auth into the container:
+Generate a long-lived OAuth token (valid for 1 year) with your Pro/Max account:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
-claude   # log in with your Pro/Max account, then exit
-
-mkdir claude-config
-cp -r ~/.claude claude-config/.claude
-cp ~/.claude.json claude-config/.claude.json
+claude setup-token
 ```
+
+Copy the token — it goes into `.env` as `CLAUDE_CODE_OAUTH_TOKEN`. The Claude CLI inside the container picks it up from the environment, no login or config files needed.
 
 ### 2. Environment
 
@@ -27,7 +25,7 @@ cp ~/.claude.json claude-config/.claude.json
 cp .env.example .env
 ```
 
-Fill in the values 
+Fill in the values, including `CLAUDE_CODE_OAUTH_TOKEN` from the previous step.
 
 ### 3. Run
 
@@ -38,7 +36,7 @@ docker compose --profile api up --build
 ## Usage
 
 ```bash
-curl -X POST http://localhost:8080/claude/ask \
+curl -X POST http://localhost:8082/claude/ask \
   -H "Content-Type: application/json" \
   -d '{"question": "What is a goroutine?", "prompt": "Answer in one sentence"}'
 ```

@@ -1,9 +1,13 @@
-FROM golang:tip-alpine3.24 as build
+FROM golang:1.26.4 as build
 WORKDIR /opt/api
 
 COPY go.mod go.sum ./
+
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
 COPY ./internal ./internal
 COPY ./cmd ./cmd
+COPY ./pkg ./pkg
 
 RUN go build ./cmd/main.go
 
@@ -11,9 +15,13 @@ FROM node:22-slim
 WORKDIR /opt/api
 
 RUN npm install -g @anthropic-ai/claude-code
-COPY ./claude-config/.claude /root/.claude
-COPY ./claude-config/.claude.json /root/.claude.json
 
-COPY --from=build /opt/api/main /opt/api/main
+COPY --chown=node:node ./migrations /opt/api/migrations
+COPY --from=build --chown=node:node /opt/api/main /opt/api/main
+COPY --from=build /go/bin/migrate /usr/local/bin/migrate
 
-CMD ["./main"]
+USER node
+
+CMD . ./.env \
+  && migrate -path migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up \
+  && ./main
