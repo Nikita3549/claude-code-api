@@ -22,3 +22,11 @@ func NewDB(conf *configs.Config) *DB {
 		DB: db,
 	}
 }
+
+func (d *DB) Close() error {
+	sqlDB, err := d.DB.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

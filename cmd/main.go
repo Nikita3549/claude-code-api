@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"claude-code-api/internal/claude"
 	"claude-code-api/internal/configs"
@@ -12,7 +16,7 @@ import (
 	"claude-code-api/pkg/db"
 )
 
-func App() http.Handler {
+func App() (http.Handler, *db.DB) {
 	router := http.NewServeMux()
 	conf := configs.LoadConfig()
 	db := db.NewDB(conf)
@@ -32,11 +36,14 @@ func App() http.Handler {
 	// Handlers
 	claude.NewClaudeHandler(router, claudeService)
 
-	return router
+	return router, db
 }
 
 func main() {
-	app := App()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	app, db := App()
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -48,5 +55,14 @@ func main() {
 	}
 
 	log.Printf("Server started on port %v", port)
-	server.ListenAndServe()
+	go server.ListenAndServe()
+
+	<-ctx.Done()
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	server.Shutdown(shutdownCtx)
+	db.Close()
+	log.Println("Server stopped")
 }
