@@ -12,6 +12,11 @@ import (
 type Config struct {
 	*HTTPConfig
 	*DBConfig
+	*MCPServersConfig
+}
+
+type MCPServersConfig struct {
+	NotionToken string `env:"NOTION_TOKEN" optional:"true"`
 }
 
 type HTTPConfig struct {

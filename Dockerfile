@@ -16,6 +16,7 @@ WORKDIR /opt/api
 
 RUN npm install -g @anthropic-ai/claude-code
 
+COPY --chown=node:node ./.mcp-configs /opt/api/.mcp-configs
 COPY --chown=node:node ./migrations /opt/api/migrations
 COPY --from=build --chown=node:node /opt/api/main /opt/api/main
 COPY --from=build /go/bin/migrate /usr/local/bin/migrate

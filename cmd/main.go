@@ -25,7 +25,7 @@ func App() (http.Handler, *db.DB) {
 	requestRepository := requests.NewRequestRepository(db)
 
 	// Services
-	claudeClient := claude.NewClient()
+	claudeClient := claude.NewClient(conf)
 	claudeService := claude.NewClaudeService(
 		&claude.ClaudeServiceDeps{
 			RequestRepository: requestRepository,

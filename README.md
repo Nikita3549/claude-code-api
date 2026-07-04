@@ -27,7 +27,20 @@ cp .env.example .env
 
 Fill in the values, including `CLAUDE_CODE_OAUTH_TOKEN` from the previous step.
 
-### 3. Run
+### 3. Notion MCP (optional)
+
+The service can give Claude access to your Notion workspace via the [Notion MCP server](https://github.com/makenotion/notion-mcp-server). It is enabled automatically when `NOTION_TOKEN` is set; if the variable is empty, the service runs without it.
+
+To get a token:
+
+1. Open [notion.so/my-integrations](https://www.notion.so/my-integrations) (you need permission to create integrations in the workspace).
+2. Click **New integration**, give it a name (e.g. `claude-code-api`) and pick the workspace.
+3. In the integration settings set capabilities: **Read content** at minimum; add **Update/Insert content** only if the service should write to Notion.
+4. Copy the **Internal Integration Secret** (starts with `ntn_`) — this is the token.
+5. **Required:** share the pages/databases with the integration — open a page in Notion → **•••** menu → **Connections** → select your integration. Child pages inherit access. Without this step the API returns `object not found` even with a valid token.
+6. Put the token into `.env` as `NOTION_TOKEN`. It is a secret — don't commit it, keep it in `.env` or a secret store.
+
+### 4. Run
 
 ```bash
 docker compose --profile api up --build

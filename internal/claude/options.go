@@ -3,24 +3,28 @@ package claude
 type options struct {
 	systemPrompt   string
 	outputFormat   string
-	maxTurns       int
-	tools          string
+	allowedTools   string
 	permissionMode string
 	model          string
+	mcpConfig      string
 }
 
 func defaultOptions() *options {
 	return &options{
 		systemPrompt:   "",
 		outputFormat:   "json",
-		maxTurns:       1,
-		tools:          "",
+		allowedTools:   "",
+		mcpConfig:      "",
 		permissionMode: "bypassPermissions",
 		model:          "claude-sonnet-4-6",
 	}
 }
 
 type Option func(*options)
+
+func WithMcpConfig(c string) Option {
+	return func(o *options) { o.mcpConfig = c }
+}
 
 func WithSystemPrompt(p string) Option {
 	return func(o *options) { o.systemPrompt = p }
@@ -30,12 +34,8 @@ func WithOutputFormat(f string) Option {
 	return func(o *options) { o.outputFormat = f }
 }
 
-func WithMaxTurns(t int) Option {
-	return func(o *options) { o.maxTurns = t }
-}
-
 func WithAllowedTools(t string) Option {
-	return func(o *options) { o.tools = t }
+	return func(o *options) { o.allowedTools = t }
 }
 
 func WithModel(m string) Option {
